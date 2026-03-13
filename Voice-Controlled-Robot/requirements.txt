@@ -1,0 +1,4 @@
+livekit-agents[google,silero,turn-detector,images]~=1.4
+livekit-plugins-noise-cancellation~=0.2
+python-dotenv
+pydobot>=1.3.2
