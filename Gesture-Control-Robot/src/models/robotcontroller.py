@@ -27,6 +27,7 @@ class RobotController:
         self.camera = cv.VideoCapture(cameraIndex)
         self.dobot = Dobot(port, verbose=True)
         self.tracker = HandTracking(max_num_hands=numberOfHands)
+        self.margin = 10
 
     def getJointPositions(self):
         return self.dobot.pose()[4:8]
@@ -35,12 +36,18 @@ class RobotController:
 
         RGBFrame = cv.cvtColor(BGRFrame, cv.COLOR_BGR2RGB)
         BGRFrame, handlms = self.tracker.detectHands(RGBFrame)
-        if len(handlms) > 0:
-            BGRFrame, angles = self.tracker.getAnglesFromLandmarks(BGRFrame, handlms, 8, 5, 0)
+        if len(handlms) > 1:
+
+            BGRFrame, indexFingerAngles = self.tracker.getAnglesFromLandmarks(BGRFrame, handlms, 8, 5, 0)
+            BGRFrame, middleFingerAngles = self.tracker.getAnglesFromLandmarks(BGRFrame, handlms, 12, 9, 0)
         
         # move only the targeted Joint
             try:
-                self.dobot._set_ptp_cmd(angles[0], jointAngles[1], jointAngles[2], jointAngles[3],
+                self.dobot._set_ptp_cmd(
+                    indexFingerAngles[0] + self.margin, 
+                    middleFingerAngles[0] + self.margin, 
+                    indexFingerAngles[1] + self.margin, 
+                    middleFingerAngles[1] + self.margin,
                     mode=4,
                     wait=True
                 )

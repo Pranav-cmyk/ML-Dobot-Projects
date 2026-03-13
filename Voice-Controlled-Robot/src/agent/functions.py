@@ -3,12 +3,19 @@ from .prompts import instructions
 from pydobot import Dobot
 from dotenv import load_dotenv
 import os
+import serial
 
 
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=instructions)
-        self.dobot = Dobot(port=os.getenv('DOBOT_PORT'), verbose=False)
+
+        try:
+            self.dobot = Dobot(port=os.getenv('DOBOT_PORT'), verbose=False)
+        except serial.serialutil.SerialException:
+            print("Could not connect to Dobot. Please check the COM Port ENV file and try again.")
+            raise
+        
         self.currentAngles = self.dobot.pose()[4:]  
         
     @function_tool
