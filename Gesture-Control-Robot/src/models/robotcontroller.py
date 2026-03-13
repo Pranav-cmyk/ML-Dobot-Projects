@@ -40,8 +40,12 @@ class RobotController:
 
             BGRFrame, indexFingerAngles = self.tracker.getAnglesFromLandmarks(BGRFrame, handlms, 8, 5, 0)
             BGRFrame, middleFingerAngles = self.tracker.getAnglesFromLandmarks(BGRFrame, handlms, 12, 9, 0)
-        
-        # move only the targeted Joint
+            BGRFrame, distance = self.tracker.drawConnections(BGRFrame, handlms[0], 4, 20)
+            if (distance < 30):
+                self.dobot.suck(True)
+            else:
+                self.dobot.suck(False)
+
             try:
                 self.dobot._set_ptp_cmd(
                     indexFingerAngles[0] + self.margin, 
